@@ -10,7 +10,7 @@ import javafx.stage.Stage
 class HospitalApp extends Application {
 
   override def start(primaryStage: Stage): Unit = {
-    val records = CSVLoader.loadData("src/main/resources/hospital.csv")
+    val records = CSVLoader.loadData("src/main/resources/hospital (1).csv")
     val analysis = new Analysis(records)
     val ui = new HospitalUI(analysis)
     val vbox = ui.generateUI()
