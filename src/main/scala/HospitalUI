@@ -1,0 +1,64 @@
+import javafx.collections.FXCollections
+import javafx.scene.control._
+import javafx.scene.layout._
+
+class HospitalUI(analysis: Analysis) {
+
+  def generateUI(): VBox = {
+    val vbox = new VBox(10)
+
+    // Q1
+    val maxBedsState = analysis.stateWithMaxBeds
+    val question1 = new Label("1) Which state has the highest total hospital beds?")
+    val answer1 = new Label(maxBedsState match {
+      case Some((state, beds)) => s"Answer: $state with $beds beds"
+      case None => "Answer: No state found"
+    })
+
+    // Q2
+    val covidRatio = analysis.covidBedRatio
+    val question2 = new Label("2) What is the ratio of beds dedicated for COVID-19 to total available hospital beds?")
+    val answer2 = new Label(s"Answer: ${covidRatio.formatted("%.2f")} beds")
+
+    // Q3
+    val averages = analysis.averageAdmittedByState
+    val question3 = new Label("3) What are the averages of individuals admitted in each category (Suspected, COVID, Non-COVID)?")
+    val answer3 = new Label("Answer:")
+    val tableLabel = new Label("Average number of individuals admitted in each category for each state:")
+
+    //tableview
+    val table = new TableView[(String, Int, Int, Int)]()
+    table.setItems(FXCollections.observableArrayList(averages.map {
+      case (state, avg) => (state, avg._1, avg._2, avg._3)
+    }.toSeq: _*))
+
+    val stateColumn = new TableColumn[(String, Int, Int, Int), String]("State")
+    stateColumn.setCellValueFactory(cellData => new javafx.beans.property.SimpleStringProperty(cellData.getValue._1))
+
+    val suspectedColumn = new TableColumn[(String, Int, Int, Int), Int]("Suspected (Person)")
+    suspectedColumn.setCellValueFactory(cellData =>
+      new javafx.beans.property.SimpleIntegerProperty(cellData.getValue._2).asInstanceOf[javafx.beans.value.ObservableValue[Int]]
+    )
+
+    val covidColumn = new TableColumn[(String, Int, Int, Int), Int]("COVID (Person)")
+    covidColumn.setCellValueFactory(cellData =>
+      new javafx.beans.property.SimpleIntegerProperty(cellData.getValue._3).asInstanceOf[javafx.beans.value.ObservableValue[Int]]
+    )
+
+    val nonCovidColumn = new TableColumn[(String, Int, Int, Int), Int]("Non-COVID (Person)")
+    nonCovidColumn.setCellValueFactory(cellData =>
+      new javafx.beans.property.SimpleIntegerProperty(cellData.getValue._4).asInstanceOf[javafx.beans.value.ObservableValue[Int]]
+    )
+
+    table.getColumns.addAll(stateColumn, suspectedColumn, covidColumn, nonCovidColumn)
+
+    vbox.getChildren.addAll(
+      question1, answer1,
+      question2, answer2,
+      question3, answer3,
+      tableLabel, table
+    )
+
+    vbox
+  }
+}
