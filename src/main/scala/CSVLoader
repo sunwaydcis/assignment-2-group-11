@@ -1,0 +1,29 @@
+import com.github.tototoshi.csv._
+import java.io.File
+
+object CSVLoader {
+  def loadData(filePath: String): Seq[HospRecord] = {
+    val reader = CSVReader.open(new File(filePath))
+    val data = reader.allWithHeaders()
+    reader.close()
+
+    data.map(row =>
+      HospRecord(
+        row("date"),
+        row("state"),
+        row("beds").toInt,
+        row("beds_covid").toInt,
+        row("beds_noncrit").toInt,
+        row.getOrElse("admitted_pui", "0").toInt,
+        row.getOrElse("admitted_covid", "0").toInt,
+        row.getOrElse("admitted_total", "0").toInt,
+        row.getOrElse("discharged_pui", "0").toInt,
+        row.getOrElse("discharged_covid", "0").toInt,
+        row.getOrElse("discharged_total", "0").toInt,
+        row.getOrElse("hosp_covid", "0").toInt,
+        row.getOrElse("hosp_pui", "0").toInt,
+        row.getOrElse("hosp_noncovid", "0").toInt
+      )
+    )
+  }
+}
